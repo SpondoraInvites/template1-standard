@@ -688,21 +688,36 @@
       }, dur / steps);
     }
 
-    function play() {
-      var p = audio.play();
-      if (p && p.catch) p.catch(function () { /* still blocked; user can tap the button */ });
-      audio.volume = 0;
-      fadeTo(0.55);
-      btn.classList.add("is-playing");
-      btn.setAttribute("aria-pressed", "true");
+    function setPlaying(playing) {
+      btn.classList.toggle("is-playing", playing);
+      btn.setAttribute("aria-pressed", playing ? "true" : "false");
       musicApplyAria();
+    }
+
+    function play() {
+      var p;
+      audio.volume = 0;
+      try {
+        p = audio.play();
+      } catch (e) {
+        setPlaying(false);
+        return Promise.resolve(false);
+      }
+      return Promise.resolve(p).then(function () {
+        fadeTo(0.55);
+        setPlaying(true);
+        return true;
+      }, function () {
+        // Autoplay may be blocked. Keep the control honest and retry on
+        // the next guest gesture instead of showing a false playing state.
+        setPlaying(false);
+        return false;
+      });
     }
 
     function pause() {
       fadeTo(0, function () { audio.pause(); });
-      btn.classList.remove("is-playing");
-      btn.setAttribute("aria-pressed", "false");
-      musicApplyAria();
+      setPlaying(false);
     }
 
     // Only reveal the control once we know the track loads.
@@ -715,15 +730,23 @@
       else pause();
     });
 
-    // Browsers block silent autoplay — start on the guest's first gesture.
+    // Try on load (some browsers allow it), then retry on the first guest
+    // gesture when autoplay policy blocks the initial request.
     if (cfg.music.autoplay) {
-      var startOnce = function () {
-        if (audio.paused) play();
+      var stopListening = function () {
         window.removeEventListener("pointerdown", startOnce);
         window.removeEventListener("keydown", startOnce);
       };
+      var startOnce = function (e) {
+        // The button's click handler owns this gesture; handling its
+        // pointerdown too would start and immediately pause the track.
+        if (e && (e.target === btn || (btn.contains && btn.contains(e.target)))) return;
+        if (!audio.paused) { stopListening(); return; }
+        play().then(function (started) { if (started) stopListening(); });
+      };
       window.addEventListener("pointerdown", startOnce);
       window.addEventListener("keydown", startOnce);
+      play().then(function (started) { if (started) stopListening(); });
     }
 
     // Pause politely when the tab is hidden.
