@@ -247,15 +247,15 @@
       opened = true;
       intro.classList.add("is-opening");
       setTimeout(spawnPetals, 320);
-      setTimeout(function () { intro.classList.add("is-lifting"); }, 680);
-      setTimeout(function () { intro.classList.add("is-revealing"); }, 1500);
+      setTimeout(function () { intro.classList.add("is-lifting"); }, 1100);
+      setTimeout(function () { intro.classList.add("is-revealing"); }, 2100);
       setTimeout(function () {
         intro.classList.add("is-done");
         document.documentElement.classList.add("is-open");
         document.body.classList.remove("intro-active");
         drawAllIn($(".hero")); // line art draws itself as the veil clears
-      }, 1850);
-      setTimeout(function () { intro.remove(); }, 3100);
+      }, 2900);
+      setTimeout(function () { intro.remove(); }, 4100);
     });
   })();
 

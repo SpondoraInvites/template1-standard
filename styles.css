@@ -1761,6 +1761,8 @@ body.intro-active { overflow: hidden; }
   inset: 0;
   z-index: 2;
   border-radius: 10px;
+  -webkit-clip-path: polygon(0 0, 50% 52%, 100% 0, 100% 100%, 0 100%);
+  clip-path: polygon(0 0, 50% 52%, 100% 0, 100% 100%, 0 100%);
   background: linear-gradient(180deg, var(--wine) 0%, var(--wine-deep) 100%);
   box-shadow:
     inset 0 0 0 1px rgba(231, 201, 164, 0.22),
@@ -1878,7 +1880,8 @@ body.intro-active { overflow: hidden; }
   z-index: 3;
   transform-origin: top center;
   transform-style: preserve-3d;
-  transition: transform 1s cubic-bezier(0.55, 0.06, 0.35, 1);
+  transition: transform 1s cubic-bezier(0.55, 0.06, 0.35, 1),
+              z-index 0s linear 0.75s;
 }
 
 .intro__flap-face {
@@ -1896,11 +1899,14 @@ body.intro-active { overflow: hidden; }
 }
 
 .intro__flap-face--back {
+  -webkit-clip-path: polygon(0 100%, 100% 100%, 50% 0);
+  clip-path: polygon(0 100%, 100% 100%, 50% 0);
   transform: rotateX(180deg);
   background: linear-gradient(180deg, var(--gold-deep) 0%, var(--gold-soft) 100%);
 }
 
 .intro.is-opening .intro__flap {
+  z-index: 0;
   transform: rotateX(-178deg);
 }
 
