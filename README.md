@@ -74,7 +74,7 @@ custom sections, custom typography, priority delivery.
 | `script.js`  | Rendering, countdown, gallery, music, RSVP, FX.  |
 | `assets/photos/` | Gallery images (placeholder art included).   |
 | `assets/og-cover.png` | 1200×630 social share preview. Regenerate per client. |
-| `assets/music/theme.mp3` | Soothing bansuri loop (see attribution in `config.js`). Swap for the client's song when known. |
+| `assets/music/theme.mp3` | Background nasheed — "BARAKAH" (see attribution in `config.js`). Swap for the client's song when known. |
 
 ## Customising for a client
 
@@ -158,7 +158,7 @@ The `<meta name="theme-color">` in `index.html` should be updated to match
 ## Running locally
 
 ```bash
-cd template2-standard
+cd template1-standard
 python3 -m http.server 8080
 # open http://localhost:8080
 ```
