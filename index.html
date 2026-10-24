@@ -354,16 +354,25 @@
         <p class="footer__names" data-footer-names>Sumaiya &amp; Zayan</p>
         <p class="footer__date" data-footer-date>12 · 02 · 2027 · Dhaka</p>
 
-        <button class="share-btn" id="shareBtn" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="6" cy="12" r="2.6" />
-            <circle cx="18" cy="6" r="2.6" />
-            <circle cx="18" cy="18" r="2.6" />
-            <line x1="8.3" y1="10.8" x2="15.7" y2="7.2" />
-            <line x1="8.3" y1="13.2" x2="15.7" y2="16.8" />
-          </svg>
-          <span data-i18n="shareBtn">Share this Invitation</span>
-        </button>
+        <div class="share">
+          <button class="share-btn" id="shareBtn" type="button" data-share-button aria-expanded="false" aria-controls="shareMenu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="6" cy="12" r="2.6" />
+              <circle cx="18" cy="6" r="2.6" />
+              <circle cx="18" cy="18" r="2.6" />
+              <line x1="8.3" y1="10.8" x2="15.7" y2="7.2" />
+              <line x1="8.3" y1="13.2" x2="15.7" y2="16.8" />
+            </svg>
+            <span data-i18n="shareBtn">Share this Invitation</span>
+          </button>
+          <div class="share-menu" id="shareMenu" hidden>
+            <button type="button" data-share="copy" data-i18n="shareCopy">Copy link</button>
+            <button type="button" data-share="whatsapp" data-i18n="shareWhatsapp">WhatsApp</button>
+            <button type="button" data-share="messenger" data-i18n="shareMessenger">Messenger</button>
+            <button type="button" data-share="telegram" data-i18n="shareTelegram">Telegram</button>
+            <button type="button" data-share="email" data-i18n="shareEmail">Email</button>
+          </div>
+        </div>
 
         <div class="socials">
           <a href="https://www.instagram.com/spondora_invites/" target="_blank" rel="noopener" aria-label="Spondora Invites on Instagram" data-i18n-attr="socialInstagram:aria-label">
@@ -398,17 +407,26 @@
     </span>
   </button>
 
-  <!-- Floating share pill -->
-  <button class="share-fab" id="shareFab" type="button" aria-label="Share this invitation">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="6" cy="12" r="2.6" />
-      <circle cx="18" cy="6" r="2.6" />
-      <circle cx="18" cy="18" r="2.6" />
-      <line x1="8.3" y1="10.8" x2="15.7" y2="7.2" />
-      <line x1="8.3" y1="13.2" x2="15.7" y2="16.8" />
-    </svg>
-    <span data-i18n="share">Share</span>
-  </button>
+  <!-- Floating share — pill opens the same channel menu once the hero scrolls away -->
+  <div class="float-share" id="shareFloat">
+    <div class="share-menu share-menu--float" id="shareMenuFloat" hidden>
+      <button type="button" data-share="copy" data-i18n="shareCopy">Copy link</button>
+      <button type="button" data-share="whatsapp" data-i18n="shareWhatsapp">WhatsApp</button>
+      <button type="button" data-share="messenger" data-i18n="shareMessenger">Messenger</button>
+      <button type="button" data-share="telegram" data-i18n="shareTelegram">Telegram</button>
+      <button type="button" data-share="email" data-i18n="shareEmail">Email</button>
+    </div>
+    <button class="share-fab" id="shareFab" type="button" data-share-button aria-expanded="false" aria-controls="shareMenuFloat" aria-label="Share this invitation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="6" cy="12" r="2.6" />
+        <circle cx="18" cy="6" r="2.6" />
+        <circle cx="18" cy="18" r="2.6" />
+        <line x1="8.3" y1="10.8" x2="15.7" y2="7.2" />
+        <line x1="8.3" y1="13.2" x2="15.7" y2="16.8" />
+      </svg>
+      <span data-i18n="share">Share</span>
+    </button>
+  </div>
 
   <!-- Floating language toggle (English ⇄ বাংলা) -->
   <button class="lang-btn" id="langBtn" type="button" aria-label="Switch language" hidden>

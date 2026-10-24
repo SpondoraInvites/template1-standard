@@ -20,7 +20,7 @@ Everything from Classic (৳2,990):
 - Family / welcome message
 - Event cards with Google Maps + Add-to-Calendar
 - Venue with embedded map + directions
-- Shareable link (Web Share API + copy-link fallback)
+- Share menu (footer + floating pill): copy link, WhatsApp, Messenger, Telegram, email
 - Mobile-first; full-width desktop layout
 
 Signature additions:

@@ -137,21 +137,22 @@
   function applyChrome(d) {
     var ui = d.ui || {};
     Object.keys(chromeEN).forEach(function (key) {
-      var el = $('[data-i18n="' + key + '"]');
-      if (!el) return;
-      if (ui[key] == null) { el.innerHTML = chromeEN[key]; return; }
-      // Section titles pair a title with an accent word rendered in <em>.
-      if (key === "countdownTitle") { el.innerHTML = titleHtml(key, "countdownTitleAccent", "br"); return; }
-      if (key === "eventsTitle") { el.innerHTML = titleHtml(key, "eventsTitleAccent", " "); return; }
-      if (key === "venueTitle") { el.innerHTML = titleHtml(key, "venueTitleAccent", " "); return; }
-      if (key === "rsvpTitle") { el.innerHTML = titleHtml(key, "rsvpTitleAccent", " "); return; }
-      if (key === "messageLabel") {
-        // Label carries an "(optional)" hint span.
-        el.innerHTML = esc(ui[key]) +
-          (ui.optional != null ? ' <span class="field__optional">' + esc(ui.optional) + "</span>" : "");
-        return;
-      }
-      el.innerHTML = esc(ui[key]);
+      // The same key can appear more than once (e.g. both share menus).
+      $$('[data-i18n="' + key + '"]').forEach(function (el) {
+        if (ui[key] == null) { el.innerHTML = chromeEN[key]; return; }
+        // Section titles pair a title with an accent word rendered in <em>.
+        if (key === "countdownTitle") { el.innerHTML = titleHtml(key, "countdownTitleAccent", "br"); return; }
+        if (key === "eventsTitle") { el.innerHTML = titleHtml(key, "eventsTitleAccent", " "); return; }
+        if (key === "venueTitle") { el.innerHTML = titleHtml(key, "venueTitleAccent", " "); return; }
+        if (key === "rsvpTitle") { el.innerHTML = titleHtml(key, "rsvpTitleAccent", " "); return; }
+        if (key === "messageLabel") {
+          // Label carries an "(optional)" hint span.
+          el.innerHTML = esc(ui[key]) +
+            (ui.optional != null ? ' <span class="field__optional">' + esc(ui.optional) + "</span>" : "");
+          return;
+        }
+        el.innerHTML = esc(ui[key]);
+      });
     });
     Object.keys(chromeAttrs).forEach(function (key) {
       var a = chromeAttrs[key];
@@ -939,6 +940,12 @@
   })();
 
   /* ============ 10. Share ============ */
+  /* Every [data-share-button] paired (via aria-controls) with a
+     [data-share-menu] opens the same channel options (copy link,
+     WhatsApp, Messenger, Telegram, email) — the footer uses one inline;
+     a floating pill sticks to the bottom-right once the hero scrolls out
+     of view (as in template5-premium). No backend: channels compose
+     prefilled links; copying falls back to execCommand on plain http. */
   var toast = $("#toast");
   var toastTimer;
 
@@ -951,31 +958,6 @@
   }
 
   function copiedMsg() { return uiStr("copied", "Link copied to clipboard"); }
-
-  function share() {
-    var join = nameJoin();
-    var data = {
-      title: document.title,
-      text: uiStr("invitedLine", "You\u2019re invited") + " \u2014 " +
-        D.couple.name1 + " " + join + " " + D.couple.name2 +
-        " \u00B7 " + D.dateDisplay + " \u00B7 " + D.city,
-      url: location.origin === "null" || location.protocol === "file:"
-        ? "https://your-invite-link.example"
-        : location.href,
-    };
-    if (navigator.share) {
-      navigator.share(data).catch(function () { /* user dismissed */ });
-      return;
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(data.url).then(
-        function () { showToast(copiedMsg()); },
-        function () { fallbackCopy(data.url); }
-      );
-      return;
-    }
-    fallbackCopy(data.url);
-  }
 
   function fallbackCopy(text) {
     var ta = document.createElement("textarea");
@@ -994,22 +976,105 @@
     document.body.removeChild(ta);
   }
 
-  ["#shareBtn", "#shareFab"].forEach(function (sel) {
-    var btn = $(sel);
-    if (btn) btn.addEventListener("click", share);
-  });
+  function shareUrl() {
+    return location.origin === "null" || location.protocol === "file:"
+      ? "https://your-invite-link.example"
+      : location.href;
+  }
 
-  /* Floating share pill appears after hero */
-  var fab = $("#shareFab");
+  function shareText() {
+    var join = nameJoin();
+    return uiStr("invitedLine", "You\u2019re invited") + " \u2014 " +
+      D.couple.name1 + " " + join + " " + D.couple.name2 +
+      " \u00B7 " + D.dateDisplay + " \u00B7 " + D.city;
+  }
+
+  function copyLink() {
+    var url = shareUrl();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(
+        function () { showToast(copiedMsg()); },
+        function () { fallbackCopy(url); }
+      );
+      return;
+    }
+    fallbackCopy(url);
+  }
+
+  var enc = encodeURIComponent;
+  var SHARE_ACTIONS = {
+    copy: copyLink,
+    whatsapp: function () {
+      window.open("https://wa.me/?text=" + enc(shareText() + "\n" + shareUrl()), "_blank", "noopener");
+    },
+    // shortcut: deep link only opens the Messenger app (mobile); the
+    // desktop web dialog needs a registered Facebook app ID
+    messenger: function () {
+      window.open("fb-messenger://share/?link=" + enc(shareUrl()), "_blank", "noopener");
+    },
+    telegram: function () {
+      window.open("https://t.me/share/url?url=" + enc(shareUrl()) + "&text=" + enc(shareText()), "_blank", "noopener");
+    },
+    email: function () {
+      location.href = "mailto:?subject=" + enc(shareText()) + "&body=" + enc(shareText() + "\n" + shareUrl());
+    },
+  };
+
+  (function initShareMenus() {
+    var pairs = [];
+
+    $$("[data-share-button]").forEach(function (button) {
+      var menu = $("#" + (button.getAttribute("aria-controls") || ""));
+      if (!menu) return;
+      menu.hidden = false; // JS is healthy — visibility is CSS' job now
+
+      var setOpen = function (open) {
+        menu.classList.toggle("open", open);
+        button.setAttribute("aria-expanded", open ? "true" : "false");
+      };
+
+      button.addEventListener("click", function () {
+        setOpen(!menu.classList.contains("open"));
+      });
+      document.addEventListener("click", function (e) {
+        if (menu.classList.contains("open") &&
+            !menu.contains(e.target) &&
+            (e.target.closest ? e.target.closest("[data-share-button]") : null) !== button) {
+          setOpen(false);
+        }
+      });
+      for (var key in SHARE_ACTIONS) {
+        (function (key) {
+          var b = menu.querySelector('[data-share="' + key + '"]');
+          if (!b) return;
+          b.addEventListener("click", function () {
+            SHARE_ACTIONS[key]();
+            if (key !== "copy") setOpen(false);
+          });
+        })(key);
+      }
+      pairs.push({ button: button, menu: menu, setOpen: setOpen });
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape") return;
+      pairs.forEach(function (p) {
+        if (p.menu.classList.contains("open")) { p.setOpen(false); p.button.focus(); }
+      });
+    });
+  })();
+
+  /* Floating share pill is revealed after the hero scrolls out of view */
+  var floatShare = document.querySelector(".float-share");
   var hero = $(".hero");
-  if (fab && hero && "IntersectionObserver" in window) {
+  if (floatShare && hero && "IntersectionObserver" in window) {
     new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
-        fab.classList.toggle("is-visible", !e.isIntersecting);
+        floatShare.classList.toggle("is-visible", !e.isIntersecting);
       });
     }, { rootMargin: "-72px 0px 0px 0px" }).observe(hero);
-  } else if (fab) {
-    fab.classList.add("is-visible");
+  } else if (floatShare) {
+    floatShare.classList.add("is-visible");
   }
 
   /* ============ 11. Gallery + lightbox ============ */
