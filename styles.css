@@ -1366,6 +1366,35 @@ select.field__input {
   transform: translateY(-2px);
 }
 
+/* Social links — Spondora Invites profiles (as in template5-premium). */
+.socials {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: clamp(22px, 5vw, 28px);
+}
+
+.socials a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--rose);
+  border-radius: 999px;
+  color: var(--rose-soft);
+  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+.socials a:hover,
+.socials a:focus-visible {
+  background: var(--rose);
+  color: var(--wine-deep);
+  transform: translateY(-2px);
+}
+
+.socials svg { width: 18px; height: 18px; }
+
 .footer__hashtag {
   margin: clamp(26px, 5vw, 34px) 0 0;
   font-size: 11px;

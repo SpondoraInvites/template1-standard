@@ -455,6 +455,8 @@ const INVITE_TRANSLATIONS = {
       messagePlaceholder: "আপনার শুভকামনা, দোয়া ও ভালোবাসা…",
       send: "উত্তর পাঠান",
       shareBtn: "এই নিমন্ত্রণটি শেয়ার করুন",
+      socialInstagram: "ইনস্টাগ্রামে Spondora Invites",
+      socialFacebook: "ফেসবুকে Spondora Invites",
       share: "শেয়ার",
       copied: "লিংক কপি হয়েছে",
       invitedLine: "আপনি নিমন্ত্রিত",
