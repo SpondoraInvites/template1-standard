@@ -55,7 +55,8 @@ Signature additions:
   first tap (browser policy prevents true silent autoplay), fade in/out,
   pauses when the tab is hidden
 - **Live countdown** — elegant serif numerals; flips to a "Today is the
-  day" blessing once the wedding date arrives
+  day" blessing once the wedding date arrives, then to "Married" after the
+  wedding day ends (venue timezone)
 - **Enhanced animations** — staggered hero entrance, drifting rose petals
   that gust with scroll velocity, hero parallax, staggered scroll reveals,
   countdown pulse
@@ -73,7 +74,7 @@ custom sections, custom typography, priority delivery.
 | `config.js`  | **Every client-specific value lives here.**      |
 | `script.js`  | Rendering, countdown, gallery, music, RSVP, FX.  |
 | `assets/photos/` | Gallery images (placeholder art included).   |
-| `assets/og-cover.png` | 1200×630 social share preview. Regenerate per client. |
+| `assets/og-image.jpg` | 1200×630 social share preview. Regenerate per client with `node tools/generate-og-image.mjs`. |
 | `assets/music/theme.mp3` | Background nasheed — "BARAKAH" (see attribution in `config.js`). Swap for the client's song when known. |
 
 ## Customising for a client
@@ -86,10 +87,13 @@ Fields that need small care:
 
 - `weddingDateTime` — ISO format with timezone, e.g.
   `"2027-02-12T18:00:00+06:00"`. Drives the countdown; once it passes, the
-  countdown flips to the `countdownToday` blessing.
+  countdown shows the `countdownToday` blessing for the rest of the venue's
+  wedding day, then `countdownMarried` (both keyed off the first event's
+  `calTz`).
 - `ogImage` — the 1200×630 preview shown when the link is shared on
-  WhatsApp/Facebook. Replace `assets/og-cover.png` per client (photo or
-  monogram on brand colours).
+  WhatsApp/Facebook. Regenerate per client with
+  `node tools/generate-og-image.mjs` (uses the couple/date/city above).
+  Keep it an absolute URL — scrapers ignore relative `og:image` paths.
 - `intro.enabled` — set `false` to skip the wax-sealed envelope intro.
 - `heroPhoto.src` — optional couple photo inside the hero arch
   (portrait ~900×1200px); `tint` controls the wine overlay strength.

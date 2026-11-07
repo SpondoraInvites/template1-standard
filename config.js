@@ -29,8 +29,10 @@ const INVITE_CONFIG = {
 
   /* ---------- Social share preview ---------- */
   // 1200×630 image shown when the link is shared on WhatsApp/Facebook.
-  // Replace assets/og-cover.png with a branded photo/monogram per client.
-  ogImage: "assets/og-cover.png",
+  // Regenerate per client with: node tools/generate-og-image.mjs
+  // (uses the couple/date/city below). Must stay an absolute URL —
+  // scrapers ignore relative og:image paths.
+  ogImage: "https://template1-standard.spondorainvites.com/assets/og-image.jpg",
 
   /* ---------- Envelope intro ---------- */
   // A wax-sealed envelope the guest taps to open — the page then reveals
@@ -79,8 +81,10 @@ const INVITE_CONFIG = {
 
   /* ---------- Countdown ---------- */
   countdownNote: "until our forever begins — In Shaa Allah",
-  // Shown in place of the numbers once the wedding day arrives.
+  // Shown in place of the numbers once the wedding day arrives, then
+  // `countdownMarried` once that day ends (venue timezone).
   countdownToday: "Today is the day — Alhamdulillah!",
+  countdownMarried: "Married — Alhamdulillah!",
 
   /* ---------- Our Story (timeline) ---------- */
   // Each chapter becomes one milestone on the timeline.
@@ -295,6 +299,7 @@ const INVITE_TRANSLATIONS = {
 
     countdownNote: "চিরকাল শুরু হতে বাকি — ইনশাআল্লাহ",
     countdownToday: "আজই সেই দিন — আলহামদুলিল্লাহ!",
+    countdownMarried: "বিবাহ সম্পন্ন — আলহামদুলিল্লাহ!",
 
     story: {
       eyebrow: "শুরু যেভাবে",

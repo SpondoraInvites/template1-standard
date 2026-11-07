@@ -625,26 +625,40 @@
     el.classList.add("is-tick");
   }
 
-  var cdTimer = null;
-  var todayShown = false;
+  var cdState = null; // null while counting, else the config key being shown
 
-  function showToday() {
-    todayShown = true;
+  // Venue calendar day as "YYYY-MM-DD", so "today" ends at midnight in the
+  // wedding's timezone even for a guest viewing from another timezone.
+  var venueTz = (cfg.events && cfg.events[0] && cfg.events[0].calTz) || null;
+  function dayKey(ms) {
+    var d = new Date(ms);
+    if (venueTz && typeof Intl !== "undefined" && Intl.DateTimeFormat) {
+      var parts = {};
+      new Intl.DateTimeFormat("en-US", { timeZone: venueTz, year: "numeric", month: "2-digit", day: "2-digit" })
+        .formatToParts(d).forEach(function (p) { parts[p.type] = p.value; });
+      return parts.year + "-" + parts.month + "-" + parts.day;
+    }
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  }
+  var weddingDay = isNaN(target) ? "" : dayKey(target);
+
+  function showState(state) {
+    cdState = state;
     var grid = $(".countdown__grid");
     var note = $("#cdToday");
     if (grid) grid.style.display = "none";
     if (note) {
-      if (D.countdownToday) note.textContent = D.countdownToday;
+      if (D[state]) note.textContent = D[state];
       note.hidden = false;
     }
-    if (cdTimer) { clearInterval(cdTimer); cdTimer = null; }
   }
 
   function tick() {
-    var diff = target - Date.now();
     if (isNaN(target)) return;
+    var diff = target - Date.now();
     if (diff <= 0) {
-      if (!todayShown) showToday();
+      var state = dayKey(Date.now()) === weddingDay ? "countdownToday" : "countdownMarried";
+      if (cdState !== state) showState(state);
       return;
     }
     setNum(cd.d, locNum(pad(Math.floor(diff / 864e5))));
@@ -653,7 +667,8 @@
     setNum(cd.s, locNum(pad(Math.floor(diff / 1e3) % 60)));
   }
   tick();
-  if (!todayShown) cdTimer = setInterval(tick, 1000);
+  // Kept running so "Today" becomes "Married" at venue midnight without a reload.
+  setInterval(tick, 1000);
 
   /* ============ 8. Background music ============ */
   var musicApplyAria = null;
@@ -1376,7 +1391,7 @@
     renderDetails(D);
     if (rsvpApplyLanguage) rsvpApplyLanguage(D);
     if (musicApplyAria) musicApplyAria();
-    if (todayShown) showToday(); // refresh the "today" blessing text
+    if (cdState) showState(cdState); // refresh the blessing text for the new language
     tick(); // repaint countdown digits (numerals change with language)
     fitNames();
     initDrawOn(); // register icons inside the freshly rendered sections
