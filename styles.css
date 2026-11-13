@@ -526,6 +526,7 @@ html.is-open .anim--6 { transition-delay: 0.82s; }
   grid-template-columns: repeat(4, 1fr);
   margin-top: clamp(26px, 6vw, 34px);
 }
+.countdown__grid[hidden] { display: none; }
 
 /* Airy clock-face cells: big serif numerals, hairline separators */
 .countdown__cell {

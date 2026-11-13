@@ -645,12 +645,33 @@
   function showState(state) {
     cdState = state;
     var grid = $(".countdown__grid");
-    var note = $("#cdToday");
-    if (grid) grid.style.display = "none";
-    if (note) {
-      if (D[state]) note.textContent = D[state];
-      note.hidden = false;
+    var note = $("[data-countdown-note]");
+    var title = $('[data-i18n="countdownTitle"]');
+    var eyebrow = $('[data-i18n="saveEyebrow"]');
+    var today = $("#cdToday");
+    if (grid) grid.hidden = true;
+    if (title) title.hidden = true;
+    if (note) note.hidden = true;
+    // "Save the Date" no longer applies once the day is here.
+    if (eyebrow) eyebrow.hidden = true;
+    if (today) {
+      if (D[state]) today.textContent = D[state];
+      today.hidden = false;
     }
+  }
+
+  function showCountdown() {
+    cdState = null;
+    var grid = $(".countdown__grid");
+    var note = $("[data-countdown-note]");
+    var title = $('[data-i18n="countdownTitle"]');
+    var eyebrow = $('[data-i18n="saveEyebrow"]');
+    var today = $("#cdToday");
+    if (grid) grid.hidden = false;
+    if (title) title.hidden = false;
+    if (note) note.hidden = false;
+    if (eyebrow) eyebrow.hidden = false;
+    if (today) today.hidden = true;
   }
 
   function tick() {
@@ -661,6 +682,7 @@
       if (cdState !== state) showState(state);
       return;
     }
+    if (cdState) showCountdown();
     setNum(cd.d, locNum(pad(Math.floor(diff / 864e5))));
     setNum(cd.h, locNum(pad(Math.floor(diff / 36e5) % 24)));
     setNum(cd.m, locNum(pad(Math.floor(diff / 6e4) % 60)));
